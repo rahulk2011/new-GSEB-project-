@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>EduBharat AI - Smart School OS</title>
+  <meta name="description" content="Comprehensive mobile-first Educational SaaS platform for Gujarat Board (GSEB) schools connecting Students, Teachers, Principals, and Parents.">
+  <meta property="og:title" content="EduBharat AI - Smart School OS">
+  <meta property="og:description" content="Comprehensive mobile-first Educational SaaS platform for Gujarat Board (GSEB) schools connecting Students, Teachers, Principals, and Parents.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#0f172a">
+
+  <style>
+    /* CSS Variables from docs/2.DESIGN.md */
+    :root {
+      --bg-base: #0f172a;           /* Slate 900 - Main Background */
+      --bg-surface: #1e293b;        /* Slate 800 - Cards and Containers */
+      --bg-surface-elevated: #334155; /* Slate 700 - Hover/Active cards */
+      --border-color: #334155;
+      --primary-accent: #6366f1;    /* Indigo 500 - Primary Buttons */
+      --primary-hover: #4f46e5;     /* Indigo 600 */
+      --secondary-accent: #10b981;  /* Emerald 500 - Success/Progress */
+      --danger-accent: #ef4444;     /* Red 500 - Errors/Absent status */
+      --warning-accent: #f59e0b;    /* Amber 500 */
+      --text-main: #f8fafc;         /* Slate 50 - Headings & Body */
+      --text-muted: #94a3b8;        /* Slate 400 - Subtitles */
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+      --font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-stack);
+      font-size: 16px;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* App container limited to 768px for native mobile feel (docs/2.DESIGN.md) */
+    .app-viewport {
+      width: 100%;
+      max-width: 768px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background-color: var(--bg-base);
+      border-left: 1px solid rgba(255, 255, 255, 0.05);
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* App Header */
+    header.app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--primary-accent), #818cf8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .brand-title span.sub {
+      font-size: 0.7rem;
+      color: var(--secondary-accent);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .role-badge {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      background: var(--bg-surface-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .role-badge.active {
+      color: #a5b4fc;
+      border-color: var(--primary-accent);
+      background: rgba(99, 102, 241, 0.15);
+    }
+
+    .btn-nav-switch {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      padding: 6px 10px;
+      border-radius: var(--radius-md);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-nav-switch:hover {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+    }
+
+    /* Main Viewport & Section Routing */
+    main.content-area {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    section.portal-view {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    section.portal-view.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* General Cards */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: -4px;
+      margin-bottom: 12px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      min-height: 44px; /* Mobile tap target requirement docs/14 */
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-family: inherit;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--primary-accent);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: #475569;
+    }
+
+    .btn-success {
+      background: var(--secondary-accent);
+      color: #ffffff;
+    }
+
+    .btn-danger {
+      background: var(--danger-accent);
+      color: #ffffff;
+    }
+
+    .btn-sm {
+      min-height: 34px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    /* Gateway Grid */
+    .hero-banner {
+      text-align: center;
+      padding: 24px 16px 12px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-title .gradient-text {
+      background: linear-gradient(135deg, #818cf8 0%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      max-width: 480px;
+      margin: 0 auto 20px;
+    }
+
+    .roles-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 540px) {
+      .roles-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .role-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .role-card:hover {
+      border-color: var(--primary-accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    .role-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .role-card-icon {
+      font-size: 28px;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface-elevated);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .role-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .role-card-meta {
+      font-size: 0.8rem;
+      color: var(--secondary-accent);
+      font-weight: 600;
+    }
+
+    .role-card-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    /* Profile Info Bar */
+    .profile-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+    }
+
+    .profile-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .profile-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-accent), #38bdf8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 1.1rem;
+    }
+
+    .profile-text h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .profile-text p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .status-pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-pill.success {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--secondary-accent);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-pill.danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger-accent);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .status-pill.warning {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning-accent);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    @media (min-width: 480px) {
+      .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .stat-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Progress Tracker */
+    .progress-track {
+      background: var(--bg-surface-elevated);
+      border-radius: 9999px;
+      height: 8px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+      height: 100%;
+      border-radius: 9999px;
+      transition: width 0.4s ease;
+    }
+
+    /* Subject Pills */
+    .subject-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .subject-chip {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .subject-chip.active, .subject-chip:hover {
+      background: var(--primary-accent);
+      color: #ffffff;
+      border-color: var(--primary-accent);
+    }
+
+    /* AI Assistant Interface */
+    .ai-box {
+      background: #141f36;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      position: relative;
+    }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #c7d2fe;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    .preset-prompts {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .prompt-chip {
+      font-size: 0.8rem;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px dashed var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .prompt-chip:hover {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: var(--primary-accent);
+      color: var(--text-main);
+    }
+
+    .ai-input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-field {
+      flex: 1;
+      background: var(--bg-base);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      min-height: 44px;
+    }
+
+    .input-field:focus {
+      border-color: var(--primary-accent);
+    }
+
+    .ai-response-card {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      display: none;
+      animation: fadeIn 0.3s;
+    }
+
+    .ai-response-card.active {
+      display: block;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Roster Table / List */
+    .roster-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .roster-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+    }
+
+    .roster-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .roster-roll {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      width: 28px;
+    }
+
+    .roster-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .roster-toggle-btns {
+      display: flex;
+      gap: 4px;
+    }
+
+    .toggle-btn {
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: var(--bg-base);
+      color: var(--text-muted);
+      cursor: pointer;
+      min-height: 36px;
+    }
+
+    .toggle-btn.present.active {
+      background: var(--secondary-accent);
+      color: #fff;
+      border-color: var(--secondary-accent);
+    }
+
+    .toggle-btn.absent.active {
+      background: var(--danger-accent);
+      color: #fff;
+      border-color: var(--danger-accent);
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      pointer-events: none;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .toast {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid var(--primary-accent);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: all 0.3s ease;
+      pointer-events: auto;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Modal System */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 580px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      animation: modalSlide 0.25s ease;
+    }
+
+    @keyframes modalSlide {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.4rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    /* Chat Messages */
+    .chat-box {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding: 10px;
+      background: var(--bg-base);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .chat-bubble {
+      max-width: 80%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .chat-bubble.sent {
+      align-self: flex-end;
+      background: var(--primary-accent);
+      color: white;
+      border-bottom-right-radius: 2px;
+    }
+
+    .chat-bubble.received {
+      align-self: flex-start;
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border-bottom-left-radius: 2px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Notice Card */
+    .notice-item {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--primary-accent);
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .notice-item.urgent {
+      border-left-color: var(--danger-accent);
+    }
+
+    .notice-item.high {
+      border-left-color: var(--warning-accent);
+    }
+
+    /* Footer */
+    footer.app-footer {
+      border-top: 1px solid var(--border-color);
+      padding: 16px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-viewport">
+    
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="brand-group" onclick="switchView('gateway')">
+        <div class="brand-icon">🎓</div>
+        <div class="brand-title">
+          EduBharat AI
+          <span class="sub">Gujarat Board (GSEB) OS</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="role-badge" id="currentRoleBadge">Gateway</span>
+        <button class="btn-nav-switch" onclick="switchView('gateway')">
+          <span>⇄</span> Switch Role
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="content-area">
+
+      <!-- ================= 1. GATEWAY SCREEN ================= -->
+      <section id="gateway" class="portal-view active">
+        <div class="hero-banner">
+          <div class="hero-badge">⚡ GSEB Standard 10 • Smart School OS</div>
+          <h1 class="hero-title">Unified Education for <span class="gradient-text">Bharat</span></h1>
+          <p class="hero-desc">Connecting Students, Teachers, Principals, and Parents with AI tools and real-time school intelligence.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🔐 Select Your Role to Enter</span>
+            <span class="role-badge active">v1.0 Zero-Dependency SPA</span>
+          </div>
+          <div class="roles-grid">
+            
+            <!-- Student Role -->
+            <div class="role-card" onclick="switchView('student')">
+              <div class="role-card-top">
+                <div class="role-card-icon">👨‍🎓</div>
+                <span class="role-card-meta">STU-GSEB-1001</span>
+              </div>
+              <h2 class="role-card-title">Student Portal</h2>
+              <p class="role-card-desc">AI Doubt Solver, Revision Notes Vault, Past Board Papers & Progress Tracking.</p>
+              <button class="btn btn-primary btn-sm btn-block">Enter as Rahul (Std 10)</button>
+            </div>
+
+            <!-- Teacher Role -->
+            <div class="role-card" onclick="switchView('teacher')">
+              <div class="role-card-top">
+                <div class="role-card-icon">👨‍🏫</div>
+                <span class="role-card-meta">TCH-201 (Std 10-A)</span>
+              </div>
+              <h2 class="role-card-title">Teacher Portal</h2>
+              <p class="role-card-desc">Smart Attendance One-Click Toggle, AI Lesson Plan & GSEB Unit Test Generator.</p>
+              <button class="btn btn-secondary btn-sm btn-block">Enter as Sharma Sir</button>
+            </div>
+
+            <!-- Principal Role -->
+            <div class="role-card" onclick="switchView('principal')">
+              <div class="role-card-top">
+                <div class="role-card-icon">🏛️</div>
+                <span class="role-card-meta">SCH-GJ-09</span>
+              </div>
+              <h2 class="role-card-title">Principal Admin</h2>
+              <p class="role-card-desc">Live Institutional Analytics, Attendance Health Score & School Broadcast System.</p>
+              <button class="btn btn-secondary btn-sm btn-block">Enter as Principal</button>
+            </div>
+
+            <!-- Parent Role -->
+            <div class="role-card" onclick="switchView('parent')">
+              <div class="role-card-top">
+                <div class="role-card-icon">👨‍👩‍👦</div>
+                <span class="role-card-meta">PAR-501 (Ward: Rahul)</span>
+              </div>
+              <h2 class="role-card-title">Parent Portal</h2>
+              <p class="role-card-desc">Real-time In-School Ward Status, Academic Marks Chart & Direct Teacher Chat.</p>
+              <button class="btn btn-secondary btn-sm btn-block">Enter as Parent</button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Quick System Architecture Banner -->
+        <div class="card" style="background: rgba(30, 41, 59, 0.5);">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <span style="font-size: 24px;">🚀</span>
+            <div>
+              <div style="font-size: 0.85rem; font-weight: 700;">Offline-First Architecture</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">
+                Engineered with Zero External CDNs, instant state routing, and simulated AI latency for high-fidelity demonstration.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ================= 2. STUDENT PORTAL ================= -->
+      <section id="student" class="portal-view">
+        
+        <!-- Profile bar -->
+        <div class="profile-bar">
+          <div class="profile-info">
+            <div class="profile-avatar">R</div>
+            <div class="profile-text">
+              <h3>Rahul Patel</h3>
+              <p>Standard 10-A • GSEB Board (Roll #18)</p>
+            </div>
+          </div>
+          <span class="status-pill success">🟢 In-School</span>
+        </div>
+
+        <!-- Syllabus Progress Card -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📊 GSEB Board Exam Readiness</span>
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-accent);">82% Completed</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: 82%;"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+            <span>Target: GSEB March 2027</span>
+            <span>118 Days Remaining</span>
+          </div>
+        </div>
+
+        <!-- AI Study Assistant (TutorBot) -->
+        <div class="ai-box">
+          <div class="ai-badge">🤖 EduBharat AI TutorBot</div>
+          <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 4px;">Ask Any GSEB Standard 10 Doubt</h3>
+          <p class="card-subtitle">Concise, formula-backed explanations aligned with GSEB textbook curriculum.</p>
+          
+          <div class="subject-chips" id="studentSubjectChips">
+            <span class="subject-chip active" onclick="selectStudentSubject(this, 'Science')">Science</span>
+            <span class="subject-chip" onclick="selectStudentSubject(this, 'Mathematics')">Mathematics</span>
+            <span class="subject-chip" onclick="selectStudentSubject(this, 'Social Science')">Social Science</span>
+            <span class="subject-chip" onclick="selectStudentSubject(this, 'English')">English</span>
+            <span class="subject-chip" onclick="selectStudentSubject(this, 'Gujarati')">Gujarati</span>
+          </div>
+
+          <div class="preset-prompts" id="presetPromptsList" style="margin-top: 8px;">
+            <div class="prompt-chip" onclick="askPresetPrompt('What is an exothermic reaction? Give example.')">
+              💡 "What is an exothermic reaction? Give example." (Ch 1 Science)
+            </div>
+            <div class="prompt-chip" onclick="askPresetPrompt('State Pythagoras theorem and how it applies in circles.')">
+              📐 "State Pythagoras theorem and formula" (Maths Ch 6)
+            </div>
+            <div class="prompt-chip" onclick="askPresetPrompt('Explain the significance of Dandi March in India Freedom Struggle.')">
+              🇮🇳 "Significance of Dandi March (1930)" (Social Science)
+            </div>
+          </div>
+
+          <div class="ai-input-row">
+            <input type="text" id="studentAiInput" class="input-field" placeholder="Ask a question or topic name...">
+            <button class="btn btn-primary" id="btnStudentAsk" onclick="handleStudentAskAi()">
+              <span>Ask AI</span>
+            </button>
+          </div>
+
+          <!-- AI Response Output -->
+          <div class="ai-response-card" id="studentAiResponse">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 700; color: #a5b4fc;">✨ AI Tutor Explanation</span>
+              <span style="font-size: 0.7rem; color: var(--text-muted);" id="studentAiLatency">1.2s response</span>
+            </div>
+            <div id="studentAiContent" style="color: var(--text-main);"></div>
+          </div>
+        </div>
+
+        <!-- Quick Revision Note Vault -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📚 Revision Note Vault</span>
+            <span class="role-badge">Dark-Mode PDFs</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button class="btn btn-secondary btn-sm" onclick="openRevisionModal('science')">
+              🔬 Science Ch 1-6 Notes
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="openRevisionModal('maths')">
+              📐 Maths Formulas Cheat Sheet
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="openRevisionModal('social')">
+              🏛️ Social Science Timelines
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="openRevisionModal('papers')">
+              📑 GSEB 2024 Past Papers
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent Unit Test Scores -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📝 Recent Class Unit Tests</span>
+            <span style="font-size: 0.8rem; color: var(--secondary-accent);">Avg: 92.5%</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-elevated); border-radius: var(--radius-sm);">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Science: Chemical Reactions Unit Test</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Assessed by Sharma Sir • Oct 14</div>
+              </div>
+              <span class="status-pill success">18 / 20</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-elevated); border-radius: var(--radius-sm);">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Mathematics: Quadratic Equations & Triangles</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Assessed by Sharma Sir • Oct 18</div>
+              </div>
+              <span class="status-pill success">19 / 20</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ================= 3. TEACHER PORTAL ================= -->
+      <section id="teacher" class="portal-view">
+        
+        <!-- Profile bar -->
+        <div class="profile-bar">
+          <div class="profile-info">
+            <div class="profile-avatar" style="background: linear-gradient(135deg, #10b981, #06b6d4);">S</div>
+            <div class="profile-text">
+              <h3>Sharma Sir</h3>
+              <p>Senior Science Teacher • Class Teacher Std 10-A (TCH-201)</p>
+            </div>
+          </div>
+          <span class="status-pill success">Active Duty</span>
+        </div>
+
+        <!-- Quick Metrics -->
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-value" id="teacherTotalStudents">45</div>
+            <div class="stat-label">Total Students</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" style="color: var(--secondary-accent);" id="teacherPresentCount">42</div>
+            <div class="stat-label">Present Today</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" style="color: var(--danger-accent);" id="teacherAbsentCount">3</div>
+            <div class="stat-label">Absent Today</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" style="color: var(--warning-accent);">14</div>
+            <div class="stat-label">Pending Grading</div>
+          </div>
+        </div>
+
+        <!-- Smart Attendance System -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <span class="card-title">📋 Smart Attendance System (10-A)</span>
+              <div class="card-subtitle" style="margin-bottom: 0;">Date: 2026-10-20 • One-touch status toggles</div>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn btn-secondary btn-sm" onclick="markAllAttendance('present')">All Present</button>
+              <button class="btn btn-secondary btn-sm" onclick="markAllAttendance('absent')">All Absent</button>
+            </div>
+          </div>
+
+          <div class="roster-list" id="attendanceRosterList">
+            <!-- Rendered by JS -->
+          </div>
+
+          <div style="margin-top: 12px; display: flex; gap: 8px;">
+            <button class="btn btn-success btn-block" id="btnSaveAttendance" onclick="submitAttendance()">
+              💾 Save Class Attendance & Sync Parents
+            </button>
+          </div>
+        </div>
+
+        <!-- AI Lesson Plan & Unit Test Generator (Teacher Co-Pilot) -->
+        <div class="ai-box">
+          <div class="ai-badge">🤖 EduBharat Teacher Co-Pilot</div>
+          <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 4px;">GSEB 20-Mark Unit Test & Lesson Blueprint</h3>
+          <p class="card-subtitle">Instantly construct unit test papers according to official GSEB section weighting.</p>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+            <div>
+              <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Subject</label>
+              <select id="teacherSubjectSelect" class="input-field" style="width: 100%;">
+                <option value="Science">Class 10 Science</option>
+                <option value="Maths">Class 10 Mathematics</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Target Chapter</label>
+              <select id="teacherChapterSelect" class="input-field" style="width: 100%;">
+                <option value="Ch 1 Chemical Reactions & Equations">Ch 1: Chemical Reactions</option>
+                <option value="Ch 2 Acids, Bases & Salts">Ch 2: Acids, Bases & Salts</option>
+                <option value="Ch 6 Life Processes">Ch 6: Life Processes</option>
+                <option value="Ch 8 Trigonometry">Ch 8: Introduction to Trigonometry</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-block" id="btnGenerateLesson" onclick="generateLessonPlan()">
+            ✨ Generate GSEB 20-Mark Paper & Rubric
+          </button>
+
+          <div class="ai-response-card" id="lessonPlanResponse">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 700; color: #a5b4fc;">📋 Generated GSEB Unit Test (20 Marks)</span>
+              <button class="btn btn-secondary btn-sm" onclick="copyLessonPlan()">📋 Copy Text</button>
+            </div>
+            <div id="lessonPlanContent" style="white-space: pre-line; color: var(--text-main); font-size: 0.8rem; line-height: 1.5;"></div>
+          </div>
+        </div>
+
+        <!-- Evaluation Queue -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">⏳ Paper Evaluation Queue</span>
+            <span class="role-badge">14 Remaining</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--bg-surface-elevated); border-radius: var(--radius-sm);">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Std 10-A Science Unit Test 3</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">31/45 graded • Last updated 2 hrs ago</div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="openEvaluationModal()">Continue Grading</button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ================= 4. PRINCIPAL PORTAL ================= -->
+      <section id="principal" class="portal-view">
+        
+        <!-- School Header -->
+        <div class="profile-bar">
+          <div class="profile-info">
+            <div class="profile-avatar" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">🏛️</div>
+            <div class="profile-text">
+              <h3>Dr. K. V. Joshi (Principal)</h3>
+              <p>GSEB Model Vidyalaya, Gandhinagar (SCH-GJ-09)</p>
+            </div>
+          </div>
+          <span class="status-pill success">Institutional Admin</span>
+        </div>
+
+        <!-- School Analytics Overview -->
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-value">1,450</div>
+            <div class="stat-label">Total Students</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">52</div>
+            <div class="stat-label">Teaching Staff</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" style="color: var(--secondary-accent);">94.2%</div>
+            <div class="stat-label">Overall Attendance</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" style="color: #818cf8;">78.5%</div>
+            <div class="stat-label">Academic Health</div>
+          </div>
+        </div>
+
+        <!-- Executive AI Insights -->
+        <div class="card" style="border-color: rgba(99, 102, 241, 0.4); background: #131c31;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span class="card-title">🤖 Executive Insights Agent</span>
+            <span class="role-badge active">Daily Briefing</span>
+          </div>
+          <div style="font-size: 0.85rem; line-height: 1.5; color: #cbd5e1;">
+            • <strong>Attendance Alert:</strong> Standard 10-B registered 89.1% attendance today (3.2% below average) due to regional sports trials.<br>
+            • <strong>Curriculum Milestone:</strong> Standard 10 Science has covered 84% of term syllabus (ahead of GSEB district schedule).<br>
+            • <strong>Notice Pending:</strong> First Semester Board Model Test dates require school-wide broadcast.
+          </div>
+        </div>
+
+        <!-- Class Breakdown Table -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🏫 Class Performance & Attendance</span>
+            <span class="role-badge">Live Status</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-elevated); border-radius: var(--radius-sm);">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Standard 10-A (Sharma Sir)</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">45 Enrolled • 42 Present</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-weight: 700; color: var(--secondary-accent); font-size: 0.9rem;">93.3%</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">Health: Excellent</div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-elevated); border-radius: var(--radius-sm);">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Standard 10-B (Mehta Madam)</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">44 Enrolled • 39 Present</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-weight: 700; color: var(--warning-accent); font-size: 0.9rem;">88.6%</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">Health: Monitor</div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-elevated); border-radius: var(--radius-sm);">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Standard 9-A (Patel Sir)</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">48 Enrolled • 46 Present</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-weight: 700; color: var(--secondary-accent); font-size: 0.9rem;">95.8%</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">Health: Optimal</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- School-Wide Broadcast Notice System -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📢 Disseminate Broadcast Notice</span>
+            <span class="role-badge">Multi-Stakeholder</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div>
+              <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Notice Title</label>
+              <input type="text" id="broadcastTitle" class="input-field" style="width: 100%;" value="First Semester Board Model Exam Schedule">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Priority</label>
+                <select id="broadcastPriority" class="input-field" style="width: 100%;">
+                  <option value="high">High Priority</option>
+                  <option value="urgent">Urgent / Emergency</option>
+                  <option value="normal">Normal Information</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Target Audience</label>
+                <select id="broadcastTarget" class="input-field" style="width: 100%;">
+                  <option value="all">Teachers, Parents & Students</option>
+                  <option value="parents">Parents Only</option>
+                  <option value="teachers">Staff Only</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Message Body</label>
+              <textarea id="broadcastMessage" class="input-field" style="width: 100%; min-height: 80px; resize: vertical;">The GSEB First Semester Model Examination begins on Monday, 9:00 AM sharp. Students must carry their official school hall tickets and geometry boxes.</textarea>
+            </div>
+
+            <button class="btn btn-primary btn-block" id="btnDispatchBroadcast" onclick="dispatchBroadcastNotice()">
+              🚀 Dispatch Broadcast to 1,502 Recipients
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Noticeboard Feed -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📌 Live School Noticeboard</span>
+            <span class="role-badge" id="noticeCountBadge">2 Notices</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;" id="principalNoticeList">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ================= 5. PARENT PORTAL ================= -->
+      <section id="parent" class="portal-view">
+        
+        <!-- Profile bar -->
+        <div class="profile-bar">
+          <div class="profile-info">
+            <div class="profile-avatar" style="background: linear-gradient(135deg, #06b6d4, #6366f1);">P</div>
+            <div class="profile-text">
+              <h3>Ramesh Patel (Parent)</h3>
+              <p>Ward: Rahul Patel • Std 10-A (GSEB)</p>
+            </div>
+          </div>
+          <span class="status-pill success">Verified Parent</span>
+        </div>
+
+        <!-- Real-Time Ward Safety Status -->
+        <div class="card" style="background: #112233; border-color: rgba(16, 185, 129, 0.4);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span class="card-title" style="color: #6ee7b7;">🛡️ Ward Live School Status</span>
+            <span class="status-pill success" id="parentWardPill">🟢 Present in Campus</span>
+          </div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.5;">
+            Rahul scanned in through School Main Gate RFID at <strong>07:45 AM</strong>.<br>
+            Current Period: <strong>Science Lab with Sharma Sir</strong> (Room 204).
+          </div>
+          <div style="margin-top: 10px; display: flex; gap: 8px;">
+            <button class="btn btn-secondary btn-sm" onclick="callSchoolHelpdesk()">📞 School Helpdesk</button>
+            <button class="btn btn-secondary btn-sm" onclick="viewBusRoute()">🚌 View School Bus Route</button>
+          </div>
+        </div>
+
+        <!-- Attendance & Academic Health Summary -->
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-value" style="color: var(--secondary-accent);">92%</div>
+            <div class="stat-label">Attendance Rate</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">18.5/20</div>
+            <div class="stat-label">Recent Test Avg</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" style="color: var(--secondary-accent);">Paid</div>
+            <div class="stat-label">Term 2 Fees</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" style="color: #818cf8;">Rank #3</div>
+            <div class="stat-label">Class Standings</div>
+          </div>
+        </div>
+
+        <!-- Academic Progress Tracking -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📈 Academic Progress (Class 10-A)</span>
+            <span class="role-badge">Term 1 Results</span>
+          </div>
+          
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                <span>Science (Sharma Sir)</span>
+                <span style="font-weight: 700; color: var(--secondary-accent);">90% (18/20)</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width: 90%;"></div></div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                <span>Mathematics (Sharma Sir)</span>
+                <span style="font-weight: 700; color: var(--secondary-accent);">95% (19/20)</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width: 95%;"></div></div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                <span>Social Science (Patel Sir)</span>
+                <span style="font-weight: 700; color: #818cf8;">85% (17/20)</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width: 85%;"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direct Teacher Chat -->
+        <div class="card">
+          <div class="card-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="card-title">💬 Message Class Teacher</span>
+              <span class="status-pill success" style="padding: 2px 6px; font-size: 0.7rem;">Sharma Sir Online</span>
+            </div>
+          </div>
+
+          <div class="chat-box" id="parentChatBox">
+            <div class="chat-bubble received">
+              Namaste Mr. Patel. Rahul scored 18/20 in the Chemical Reactions test today. Keep encouraging his evening revision.
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-top: 10px;">
+            <input type="text" id="parentChatInput" class="input-field" placeholder="Type a message for Sharma Sir...">
+            <button class="btn btn-primary" onclick="sendParentMessage()">Send</button>
+          </div>
+        </div>
+
+        <!-- Fee Receipt Verification -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🧾 Fee Payment Status</span>
+            <span class="status-pill success">All Dues Cleared</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+            <div>
+              <div style="font-weight: 600;">Receipt #EB-2026-992</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Term 1 & Term 2 Academic & Lab Fees</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="showFeeReceiptModal()">View Receipt</button>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- App Footer -->
+    <footer class="app-footer">
+      <div>EduBharat AI v1.0 • Gujarat Board (GSEB) Smart School Operating System</div>
+      <div style="margin-top: 4px; font-size: 0.7rem; color: #64748b;">
+        Offline-First Single-Page Architecture • Built with AI for Indian Education
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Toast Element -->
+  <div class="toast-container">
+    <div class="toast" id="appToast">
+      <span id="toastIcon">✅</span>
+      <span id="toastMsg">Action completed successfully</span>
+    </div>
+  </div>
+
+  <!-- Modal Element -->
+  <div class="modal-overlay" id="appModal" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <div id="modalHeader" style="font-size: 1.1rem; font-weight: 700; color: #a5b4fc;">Modal Title</div>
+      <div id="modalBody" style="color: var(--text-main); font-size: 0.85rem; line-height: 1.6;"></div>
+      <div style="margin-top: 10px; display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="btn btn-secondary btn-sm" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Logic (Vanilla JS, Zero Dependencies) -->
+  <script>
+    // State Store (docs/4.DATABASE.md)
+    const appData = {
+      currentRole: 'gateway',
+      student: {
+        id: "STU-GSEB-1001",
+        name: "Rahul Patel",
+        grade: "Standard 10",
+        board: "GSEB",
+        progress: 82,
+        inSchool: true,
+        tests: [
+          { subject: "Science", topic: "Chemical Reactions", score: "18/20", date: "Oct 14" },
+          { subject: "Mathematics", topic: "Quadratic Equations", score: "19/20", date: "Oct 18" },
+          { subject: "Social Science", topic: "Heritage of India", score: "17/20", date: "Oct 10" }
+        ]
+      },
+      teacher: {
+        id: "TCH-201",
+        name: "Sharma Sir",
+        assignedClass: "Standard 10-A",
+        totalStudents: 45,
+        presentCount: 42,
+        absentCount: 3,
+        students: [
+          { roll: 1, name: "Aarav Shah", status: "present" },
+          { roll: 2, name: "Aditi Trivedi", status: "present" },
+          { roll: 3, name: "Bhavya Dave", status: "absent" },
+          { roll: 4, name: "Chirag Modi", status: "present" },
+          { roll: 5, name: "Diya Parikh", status: "present" },
+          { roll: 6, name: "Harsh Joshi", status: "present" },
+          { roll: 7, name: "Kavya Desai", status: "present" },
+          { roll: 8, name: "Krisha Vora", status: "absent" },
+          { roll: 9, name: "Meet Solanki", status: "present" },
+          { roll: 10, name: "Nandini Vyas", status: "present" },
+          { roll: 11, name: "Om Panchal", status: "present" },
+          { roll: 12, name: "Pooja Mehta", status: "present" },
+          { roll: 13, name: "Pranav Barot", status: "present" },
+          { roll: 14, name: "Priya Chauhan", status: "present" },
+          { roll: 15, name: "Radha Bhatt", status: "present" },
+          { roll: 16, name: "Rajesh Soni", status: "absent" },
+          { roll: 17, name: "Riya Raval", status: "present" },
+          { roll: 18, name: "Rahul Patel", status: "present" },
+          { roll: 19, name: "Sahil Parmar", status: "present" },
+          { roll: 20, name: "Tanvi Patel", status: "present" }
+        ]
+      },
+      principal: {
+        schoolId: "SCH-GJ-09",
+        schoolName: "GSEB Model Vidyalaya",
+        notices: [
+          {
+            id: "BC-2026-88",
+            title: "First Semester Board Model Exam Schedule",
+            priority: "high",
+            target: "Teachers, Parents & Students",
+            time: "Today at 08:30 AM",
+            body: "The GSEB First Semester Model Examination begins on Monday, 9:00 AM sharp. Students must carry their official school hall tickets and geometry boxes."
+          },
+          {
+            id: "BC-2026-87",
+            title: "Parent-Teacher Conference (PTC) for Standard 10",
+            priority: "normal",
+            target: "Parents Only",
+            time: "Yesterday",
+            body: "PTC meeting scheduled for upcoming Saturday to discuss unit test scores and GSEB board registration forms."
+          }
+        ]
+      }
+    };
+
+    // View Switching Router (docs/3.ARCHITECTURE.md)
+    function switchView(roleId) {
+      appData.currentRole = roleId;
+      
+      const sections = document.querySelectorAll('section.portal-view');
+      sections.forEach(sec => sec.classList.remove('active'));
+
+      const target = document.getElementById(roleId);
+      if (target) {
+        target.classList.add('active');
+      }
+
+      // Update Header Role Badge
+      const badge = document.getElementById('currentRoleBadge');
+      if (roleId === 'gateway') {
+        badge.textContent = 'Gateway';
+        badge.className = 'role-badge';
+      } else {
+        badge.textContent = roleId.toUpperCase() + ' PORTAL';
+        badge.className = 'role-badge active';
+      }
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Trigger view-specific renderers
+      if (roleId === 'teacher') {
+        renderTeacherRoster();
+      } else if (roleId === 'principal') {
+        renderPrincipalNotices();
+      }
+    }
+
+    // Toast Notification helper
+    function showToast(message, icon = '✅') {
+      const toast = document.getElementById('appToast');
+      const msgElem = document.getElementById('toastMsg');
+      const iconElem = document.getElementById('toastIcon');
+
+      msgElem.textContent = message;
+      iconElem.textContent = icon;
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Modal Helpers
+    function openModal(title, htmlContent) {
+      document.getElementById('modalHeader').innerHTML = title;
+      document.getElementById('modalBody').innerHTML = htmlContent;
+      document.getElementById('appModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('appModal').classList.remove('open');
+    }
+
+    function closeModalOnBackdrop(e) {
+      if (e.target.id === 'appModal') {
+        closeModal();
+      }
+    }
+
+    // ================= STUDENT LOGIC =================
+    let selectedStudentSubject = 'Science';
+
+    function selectStudentSubject(elem, subject) {
+      selectedStudentSubject = subject;
+      const chips = document.querySelectorAll('#studentSubjectChips .subject-chip');
+      chips.forEach(c => c.classList.remove('active'));
+      elem.classList.add('active');
+
+      const presets = document.getElementById('presetPromptsList');
+      if (subject === 'Science') {
+        presets.innerHTML = `
+          <div class="prompt-chip" onclick="askPresetPrompt('What is an exothermic reaction? Give example.')">
+            💡 "What is an exothermic reaction? Give example." (Ch 1 Science)
+          </div>
+          <div class="prompt-chip" onclick="askPresetPrompt('Explain the process of photosynthesis and chemical equation.')">
+            🌿 "Explain photosynthesis equation and steps" (Ch 6 Life Processes)
+          </div>
+          <div class="prompt-chip" onclick="askPresetPrompt('Difference between roasting and calcination in metallurgy.')">
+            ⚗️ "Difference between roasting and calcination" (Ch 3 Metals)
+          </div>
+        `;
+      } else if (subject === 'Mathematics') {
+        presets.innerHTML = `
+          <div class="prompt-chip" onclick="askPresetPrompt('State Pythagoras theorem and how it applies in right triangles.')">
+            📐 "State Pythagoras theorem and formula" (Maths Ch 6)
+          </div>
+          <div class="prompt-chip" onclick="askPresetPrompt('Derive the quadratic formula using completing square method.')">
+            🔢 "Derivation of Quadratic formula" (Maths Ch 4)
+          </div>
+          <div class="prompt-chip" onclick="askPresetPrompt('Explain trigonometric ratios for standard angles 30, 45, 60 degrees.')">
+            📏 "Trigonometric standard table values" (Maths Ch 8)
+          </div>
+        `;
+      } else {
+        presets.innerHTML = `
+          <div class="prompt-chip" onclick="askPresetPrompt('Explain the significance of Dandi March in India Freedom Struggle.')">
+            🇮🇳 "Significance of Dandi March (1930)" (Social Science)
+          </div>
+          <div class="prompt-chip" onclick="askPresetPrompt('Types of soils found in Gujarat and their agricultural importance.')">
+            🌾 "Types of soils in Gujarat" (Ch 8 Geography)
+          </div>
+        `;
+      }
+    }
+
+    function askPresetPrompt(text) {
+      document.getElementById('studentAiInput').value = text;
+      handleStudentAskAi();
+    }
+
+    function handleStudentAskAi() {
+      const input = document.getElementById('studentAiInput');
+      const question = input.value.trim();
+      if (!question) {
+        showToast('Please type a question or select a preset prompt', '⚠️');
+        return;
+      }
+
+      const btn = document.getElementById('btnStudentAsk');
+      btn.innerHTML = `<span class="spinner"></span> Thinking...`;
+      btn.disabled = true;
+
+      // Simulated 1.2s - 1.5s latency per docs/5.API.md
+      setTimeout(() => {
+        btn.innerHTML = `<span>Ask AI</span>`;
+        btn.disabled = false;
+
+        const responseCard = document.getElementById('studentAiResponse');
+        const contentElem = document.getElementById('studentAiContent');
+        const latencyElem = document.getElementById('studentAiLatency');
+
+        latencyElem.textContent = '1.35s • GSEB Std 10 Verified';
+
+        let answer = '';
+        const qLower = question.toLowerCase();
+
+        if (qLower.includes('exothermic')) {
+          answer = `
+            <strong>Definition:</strong> An exothermic reaction is a chemical reaction that releases energy by light or heat to its surroundings.<br><br>
+            <strong>Chemical Equation (GSEB Standard):</strong><br>
+            <code>CH₄(g) + 2O₂(g) ➔ CO₂(g) + 2H₂O(g) + Heat (Energy)</code><br><br>
+            <strong>Key GSEB Exam Points:</strong><br>
+            • Respiration is considered an exothermic process because glucose breaks down with oxygen to release ATP energy.<br>
+            • Decomposition of vegetable matter into compost is another classic exothermic example.<br>
+            • <em>Exam Tip:</em> Always write physical states (s, l, g, aq) for full 2-mark credit in Section B!
+          `;
+        } else if (qLower.includes('pythagoras')) {
+          answer = `
+            <strong>Theorem Statement (GSEB Theorem 6.8):</strong><br>
+            "In a right triangle, the square of the hypotenuse is equal to the sum of the squares of the other two sides."<br><br>
+            <strong>Formula:</strong> <code>AC² = AB² + BC²</code> (where ∠B = 90°)<br><br>
+            <strong>Proof Blueprint (GSEB 4 Marks):</strong><br>
+            1. Draw perpendicular BD from right angle vertex B to hypotenuse AC.<br>
+            2. Prove △ADB ~ △ABC, leading to <code>AD/AB = AB/AC ➔ AB² = AD × AC</code>.<br>
+            3. Prove △BDC ~ △ABC, leading to <code>CD/BC = BC/AC ➔ BC² = CD × AC</code>.<br>
+            4. Adding equations (1) and (2) gives <code>AB² + BC² = AC(AD + CD) = AC²</code>. (Q.E.D.)
+          `;
+        } else if (qLower.includes('dandi')) {
+          answer = `
+            <strong>Dandi March (Salt Satyagraha - 1930):</strong><br><br>
+            • <strong>Date & Route:</strong> Started on 12th March 1930 from Sabarmati Ashram (Ahmedabad) and reached Dandi on 5th April 1930 (241 miles, 24 days).<br>
+            • <strong>Event:</strong> On 6th April 1930, Mahatma Gandhi picked up a handful of salt and declared: <em>"With this, I am shaking the foundations of the British Empire."</em><br>
+            • <strong>Historical Impact:</strong> Marked the official nationwide launch of the Civil Disobedience Movement across Gujarat and India.
+          `;
+        } else {
+          answer = `
+            <strong>Concept Breakdown for "${question}":</strong><br><br>
+            • <strong>Core GSEB Definition:</strong> A fundamental syllabus concept frequently appearing in Section B & C board examinations.<br>
+            • <strong>Step-by-Step Understanding:</strong> Relates directly to Standard 10 Board textbook guidelines with emphasis on formula accuracy and structural diagrams.<br>
+            • <strong>Board Scoring Tip:</strong> Structure your answer in 3 concise bullet points with labeled diagrams to secure maximum marks.
+          `;
+        }
+
+        contentElem.innerHTML = answer;
+        responseCard.classList.add('active');
+        showToast('AI Tutor generated response', '✨');
+      }, 1250);
+    }
+
+    function openRevisionModal(type) {
+      if (type === 'science') {
+        openModal('🔬 GSEB Std 10 Science Revision Vault', `
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="background:var(--bg-base); padding:10px; border-radius:6px; border:1px solid var(--border-color);">
+              <strong style="color:#a5b4fc;">Chapter 1: Chemical Reactions & Equations</strong><br>
+              • Types: Combination, Decomposition, Displacement, Double Displacement, Redox.<br>
+              • Corrosion: Iron + O₂ + H₂O ➔ Rust (Fe₂O₃·xH₂O). Prevention: Galvanization with Zinc.
+            </div>
+            <div style="background:var(--bg-base); padding:10px; border-radius:6px; border:1px solid var(--border-color);">
+              <strong style="color:#a5b4fc;">Chapter 2: Acids, Bases & Salts</strong><br>
+              • pH scale: &lt;7 Acidic, 7 Neutral, &gt;7 Basic. Human blood pH: 7.35 - 7.45.<br>
+              • Bleaching Powder: Ca(OH)₂ + Cl₂ ➔ CaOCl₂ + H₂O.
+            </div>
+            <div style="background:var(--bg-base); padding:10px; border-radius:6px; border:1px solid var(--border-color);">
+              <strong style="color:#a5b4fc;">Chapter 6: Life Processes</strong><br>
+              • Nutrition: Autotrophic vs Heterotrophic.<br>
+              • Double Circulation: Heart pumps blood twice through body in one complete cardiac cycle.
+            </div>
+          </div>
+        `);
+      } else if (type === 'maths') {
+        openModal('📐 GSEB Standard 10 Maths Cheat Sheet', `
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="background:var(--bg-base); padding:10px; border-radius:6px; border:1px solid var(--border-color);">
+              <strong style="color:#a5b4fc;">Real Numbers & Polynomials</strong><br>
+              • Fundamental Theorem of Arithmetic: Every composite number = product of primes.<br>
+              • Quadratic zeroes: Sum of zeroes (α + β) = -b/a, Product (α·β) = c/a.
+            </div>
+            <div style="background:var(--bg-base); padding:10px; border-radius:6px; border:1px solid var(--border-color);">
+              <strong style="color:#a5b4fc;">Quadratic Formula & AP</strong><br>
+              • Quadratic roots: x = (-b ± √(b² - 4ac)) / (2a). Discriminant D = b² - 4ac.<br>
+              • Arithmetic Progression: an = a + (n - 1)d, Sn = n/2 [2a + (n - 1)d].
+            </div>
+            <div style="background:var(--bg-base); padding:10px; border-radius:6px; border:1px solid var(--border-color);">
+              <strong style="color:#a5b4fc;">Trigonometric Identities</strong><br>
+              • sin²θ + cos²θ = 1<br>
+              • 1 + tan²θ = sec²θ<br>
+              • 1 + cot²θ = cosec²θ
+            </div>
+          </div>
+        `);
+      } else if (type === 'social') {
+        openModal('🏛️ GSEB Social Science Timelines', `
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <p><strong>Chapter 1: Heritage of India</strong> - Natural and Cultural Heritage. Lothal dockyard in Gujarat.</p>
+            <p><strong>Chapter 8: Natural Resources</strong> - Alluvial, Black, Red, Laterite, Desert, and Mountain soils.</p>
+            <p><strong>Chapter 15: Economic Development</strong> - Developing economy characteristics, Primary/Secondary/Service sectors.</p>
+          </div>
+        `);
+      } else {
+        openModal('📑 GSEB March Past Question Papers', `
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="padding:10px; background:var(--bg-base); border-radius:6px;">
+              <strong>March 2024 GSEB Science (Paper 16-E)</strong><br>
+              Full Question Paper & Official Answer Key. Section A: 16M | Section B: 20M | Section C: 24M | Section D: 20M.
+            </div>
+            <div style="padding:10px; background:var(--bg-base); border-radius:6px;">
+              <strong>March 2024 GSEB Mathematics (Paper 12-E)</strong><br>
+              Detailed Step-by-Step Proofs & Graph Construction Solutions.
+            </div>
+          </div>
+        `);
+      }
+    }
+
+
+    // ================= TEACHER LOGIC =================
+    function renderTeacherRoster() {
+      const rosterList = document.getElementById('attendanceRosterList');
+      rosterList.innerHTML = '';
+
+      appData.teacher.students.forEach(student => {
+        const item = document.createElement('div');
+        item.className = 'roster-item';
+        item.innerHTML = `
+          <div class="roster-info">
+            <span class="roster-roll">#${student.roll}</span>
+            <span class="roster-name">${student.name}</span>
+          </div>
+          <div class="roster-toggle-btns">
+            <button class="toggle-btn present ${student.status === 'present' ? 'active' : ''}" 
+              onclick="setStudentAttendance(${student.roll}, 'present')">P</button>
+            <button class="toggle-btn absent ${student.status === 'absent' ? 'active' : ''}" 
+              onclick="setStudentAttendance(${student.roll}, 'absent')">A</button>
+          </div>
+        `;
+        rosterList.appendChild(item);
+      });
+
+      updateTeacherAttendanceCounts();
+    }
+
+    function setStudentAttendance(roll, status) {
+      const student = appData.teacher.students.find(s => s.roll === roll);
+      if (student) {
+        student.status = status;
+        renderTeacherRoster();
+      }
+    }
+
+    function markAllAttendance(status) {
+      appData.teacher.students.forEach(s => s.status = status);
+      renderTeacherRoster();
+      showToast(`Marked all students as ${status.toUpperCase()}`);
+    }
+
+    function updateTeacherAttendanceCounts() {
+      const present = appData.teacher.students.filter(s => s.status === 'present').length;
+      const absent = appData.teacher.students.filter(s => s.status === 'absent').length;
+
+      document.getElementById('teacherPresentCount').textContent = present;
+      document.getElementById('teacherAbsentCount').textContent = absent;
+    }
+
+    function submitAttendance() {
+      const btn = document.getElementById('btnSaveAttendance');
+      btn.innerHTML = `<span class="spinner"></span> Syncing with Cloud...`;
+      btn.disabled = true;
+
+      // Simulated POST /teacher/attendance/submit per docs/5.API.md
+      setTimeout(() => {
+        btn.innerHTML = `💾 Save Class Attendance & Sync Parents`;
+        btn.disabled = false;
+        showToast('Daily Attendance saved! Parent SMS and portal synced.', '✅');
+
+        // If Rahul Patel is absent/present, sync parent view
+        const rahul = appData.teacher.students.find(s => s.roll === 18);
+        if (rahul) {
+          const pill = document.getElementById('parentWardPill');
+          if (rahul.status === 'present') {
+            pill.textContent = '🟢 Present in Campus';
+            pill.className = 'status-pill success';
+          } else {
+            pill.textContent = '🔴 Marked Absent';
+            pill.className = 'status-pill danger';
+          }
+        }
+      }, 1000);
+    }
+
+    let generatedLessonPlanText = '';
+
+    function generateLessonPlan() {
+      const subject = document.getElementById('teacherSubjectSelect').value;
+      const chapter = document.getElementById('teacherChapterSelect').value;
+      const btn = document.getElementById('btnGenerateLesson');
+
+      btn.innerHTML = `<span class="spinner"></span> Drafting Blueprint...`;
+      btn.disabled = true;
+
+      // Simulated latency
+      setTimeout(() => {
+        btn.innerHTML = `✨ Generate GSEB 20-Mark Paper & Rubric`;
+        btn.disabled = false;
+
+        generatedLessonPlanText = `
+GUJARAT SECONDARY & HIGHER SECONDARY EDUCATION BOARD (GSEB)
+STANDARD 10 UNIT TEST BLUEPRINT (TOTAL: 20 MARKS)
+Subject: ${subject} • Chapter: ${chapter}
+Time Allowed: 45 Minutes
+
+SECTION A: Objective Knowledge (4 Marks - 1 Mark Each)
+1. Write the balanced chemical formula for slaked lime. (Answer: Ca(OH)₂)
+2. True or False: Rusting of iron is an endothermic process. (Answer: False)
+3. Identify the precipitate formed when sodium sulphate reacts with barium chloride.
+4. Name the type of reaction: 2Pb(NO₃)₂ ➔ 2PbO + 4NO₂ + O₂.
+
+SECTION B: Short Answer Questions (6 Marks - 2 Marks Each)
+5. Explain why respiration is considered an exothermic reaction with chemical equation.
+6. What is rancidity? Name two anti-oxidants added to fat-containing foods.
+7. Balance the following chemical equations:
+   a) Fe + H₂O ➔ Fe₃O₄ + H₂
+   b) HNO₃ + Ca(OH)₂ ➔ Ca(NO₃)₂ + H₂O
+
+SECTION C: Application & Diagram (6 Marks - 3 Marks Each)
+8. With a neat labeled diagram, explain the electrolysis of water. Why is the volume of gas collected over one electrode double that of the other?
+9. Differentiate between combination and decomposition reactions with one balanced equation each.
+
+SECTION D: Analytical Essay Question (4 Marks)
+10. Describe the activity showing the action of dilute hydrochloric acid on zinc granules. Write the balanced equation and explain the pop-sound hydrogen gas test.
+
+EVALUATION RUBRIC:
+• Equations with states: +1 Mark each
+• Accurate scientific terminology: +1 Mark each
+• Diagram neatness and labelling: +2 Marks
+        `.trim();
+
+        document.getElementById('lessonPlanContent').textContent = generatedLessonPlanText;
+        document.getElementById('lessonPlanResponse').classList.add('active');
+        showToast('GSEB 20-Mark Blueprint Generated!', '📋');
+      }, 1400);
+    }
+
+    function copyLessonPlan() {
+      if (generatedLessonPlanText) {
+        navigator.clipboard.writeText(generatedLessonPlanText);
+        showToast('Copied unit test blueprint to clipboard!', '📋');
+      }
+    }
+
+    function openEvaluationModal() {
+      openModal('📝 Paper Evaluation Queue', `
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="background:var(--bg-base); padding:12px; border-radius:6px; border:1px solid var(--border-color);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <strong>Student: Rahul Patel (Roll #18)</strong>
+              <span class="status-pill success">Graded 18/20</span>
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-muted);">
+              Question 1-4 (Section A): 4/4<br>
+              Question 5-7 (Section B): 6/6<br>
+              Question 8-9 (Section C): 5/6 (Missed state symbol in electrolysis)<br>
+              Question 10 (Section D): 3/4 (Good diagram)
+            </p>
+          </div>
+          <div style="background:var(--bg-base); padding:12px; border-radius:6px; border:1px solid var(--border-color);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <strong>Student: Priya Chauhan (Roll #14)</strong>
+              <span class="status-pill warning">Pending Marks Entry</span>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <input type="number" class="input-field" placeholder="Enter Score (out of 20)" style="max-width:160px;" value="17">
+              <button class="btn btn-primary btn-sm" onclick="showToast('Marks saved for Priya!'); closeModal();">Save Marks</button>
+            </div>
+          </div>
+        </div>
+      `);
+    }
+
+
+    // ================= PRINCIPAL LOGIC =================
+    function renderPrincipalNotices() {
+      const list = document.getElementById('principalNoticeList');
+      list.innerHTML = '';
+
+      appData.principal.notices.forEach(notice => {
+        const item = document.createElement('div');
+        item.className = `notice-item ${notice.priority}`;
+        item.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="font-size:0.9rem;">${notice.title}</strong>
+            <span class="role-badge" style="font-size:0.7rem;">${notice.time}</span>
+          </div>
+          <div style="font-size:0.8rem; color:var(--text-muted);">${notice.body}</div>
+          <div style="font-size:0.7rem; color:#818cf8; margin-top:2px;">
+            Target: ${notice.target} • Priority: ${notice.priority.toUpperCase()}
+          </div>
+        `;
+        list.appendChild(item);
+      });
+
+      document.getElementById('noticeCountBadge').textContent = `${appData.principal.notices.length} Notices`;
+    }
+
+    function dispatchBroadcastNotice() {
+      const title = document.getElementById('broadcastTitle').value.trim();
+      const priority = document.getElementById('broadcastPriority').value;
+      const target = document.getElementById('broadcastTarget').value;
+      const message = document.getElementById('broadcastMessage').value.trim();
+
+      if (!title || !message) {
+        showToast('Please fill title and message', '⚠️');
+        return;
+      }
+
+      const btn = document.getElementById('btnDispatchBroadcast');
+      btn.innerHTML = `<span class="spinner"></span> Broadcasting...`;
+      btn.disabled = true;
+
+      // Simulated POST /principal/broadcast per docs/5.API.md
+      setTimeout(() => {
+        btn.innerHTML = `🚀 Dispatch Broadcast to 1,502 Recipients`;
+        btn.disabled = false;
+
+        const newNotice = {
+          id: `BC-2026-${Math.floor(Math.random() * 900 + 100)}`,
+          title: title,
+          priority: priority,
+          target: target === 'all' ? 'Teachers, Parents & Students' : target === 'parents' ? 'Parents Only' : 'Staff Only',
+          time: 'Just Now',
+          body: message
+        };
+
+        appData.principal.notices.unshift(newNotice);
+        renderPrincipalNotices();
+        showToast(`Dispatched to 1,502 recipients! (${newNotice.id})`, '📢');
+      }, 1200);
+    }
+
+
+    // ================= PARENT LOGIC =================
+    function sendParentMessage() {
+      const input = document.getElementById('parentChatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatBox = document.getElementById('parentChatBox');
+
+      // Append parent bubble
+      const sentBubble = document.createElement('div');
+      sentBubble.className = 'chat-bubble sent';
+      sentBubble.textContent = text;
+      chatBox.appendChild(sentBubble);
+      input.value = '';
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Simulate teacher reply after 1.4s
+      setTimeout(() => {
+        const receivedBubble = document.createElement('div');
+        receivedBubble.className = 'chat-bubble received';
+        receivedBubble.textContent = "Thank you for the update. Rahul is actively engaged in class and we are reviewing his GSEB board preparation regularly.";
+        chatBox.appendChild(receivedBubble);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        showToast('Sharma Sir replied to your message', '💬');
+      }, 1400);
+    }
+
+    function showFeeReceiptModal() {
+      openModal('🧾 Fee Payment Receipt #EB-2026-992', `
+        <div style="font-size:0.85rem; display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+            <span>Student Name:</span>
+            <strong>Rahul Patel (STU-GSEB-1001)</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+            <span>Institution:</span>
+            <span>GSEB Model Vidyalaya, Gandhinagar</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+            <span>Term 1 & Term 2 Tuition:</span>
+            <span>₹14,500</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+            <span>Science & Computer Lab Fee:</span>
+            <span>₹3,000</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-weight:700; color:var(--secondary-accent); font-size:1rem; padding-top:4px;">
+            <span>Total Paid (Online UPI):</span>
+            <span>₹17,500</span>
+          </div>
+          <div style="margin-top:10px; font-size:0.75rem; color:var(--text-muted); text-align:center;">
+            Status: Confirmed • Transaction Ref: UPI-SBIN-9948201
+          </div>
+        </div>
+      `);
+    }
+
+    function callSchoolHelpdesk() {
+      showToast('Calling GSEB Model Vidyalaya Helpdesk: +91 79 2320 0000', '📞');
+    }
+
+    function viewBusRoute() {
+      openModal('🚌 School Bus Route #12 (Live GPS)', `
+        <div style="font-size:0.85rem; line-height:1.6;">
+          <p><strong>Route:</strong> Sector 22 ➔ Sector 11 ➔ Kudasan ➔ School Campus</p>
+          <p><strong>Driver:</strong> Ramesh Bhai (+91 98765 43210)</p>
+          <div style="margin-top:10px; padding:10px; background:var(--bg-base); border-radius:6px; border:1px solid var(--border-color);">
+            <span class="status-pill success">🟢 Bus Parked at School Campus</span>
+            <div style="margin-top:4px; font-size:0.75rem; color:var(--text-muted);">Afternoon departure scheduled for 02:15 PM</div>
+          </div>
+        </div>
+      `);
+    }
+
+    // Initialize View on Page Load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTeacherRoster();
+      renderPrincipalNotices();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "name": "EduBharat AI - Smart School OS",
+  "description": "Comprehensive mobile-first Educational SaaS platform for Gujarat Board (GSEB) schools connecting Students, Teachers, Principals, and Parents.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
