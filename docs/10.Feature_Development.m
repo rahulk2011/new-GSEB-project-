@@ -33,3 +33,4 @@ This roadmap tracks the feature progression of EduBharat AI across three deliber
 * Full compliance with GSEB examination regulations and state portal reporting standards.
 * Multi-lingual UI toggle (Gujarati, Hindi, English).
 * Automated grant and audit export reports for iHub / SSIP startup incubators.
+
