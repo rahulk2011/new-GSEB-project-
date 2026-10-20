@@ -1,0 +1,19 @@
+Act as a Principal Enterprise Product Manager and SaaS Strategist. Your task is to generate a comprehensive, highly detailed Product Requirements Document (PRD) for "EduBharat AI", a nationwide Smart School Operating System (SaaS). Write the output in strict, professional Markdown format, saving it as '1.PRD.md'.
+
+Context: The platform is a web-based, mobile-first ecosystem designed initially for the Gujarat Secondary and Higher Secondary Education Board (GSEB) standard 10 curriculum, with architecture to scale nationwide. The v1.0 MVP will be a localized Single-Page Application (SPA) to demonstrate the core value proposition to stakeholders (principals, investors like iHub/SSIP) before full cloud backend integration.
+
+The PRD MUST be incredibly detailed (at least 800-1000 words in its output) and MUST include the following structured sections:
+
+1. EXECUTIVE SUMMARY: Detail the vision, problem statement (communication gap, lack of AI in rural/state boards), and the proposed solution (EduBharat AI).
+2. TARGET AUDIENCE & PERSONAS: Deep dive into the 4 primary users:
+   - Student: Needs quick revision, past papers, AI doubt solving.
+   - Teacher: Needs classroom automation, AI lesson planning, quick evaluation.
+   - Principal: Needs bird's-eye analytics, broadcast communication, staff tracking.
+   - Parent: Needs transparent progress tracking, attendance alerts.
+3. CORE MVP FEATURES (v1.0): List the absolute essential features required to make the prototype functional. Separate them by Role.
+4. USER STORIES: Write at least 3 detailed user stories per role using the Agile format: "As a [Role], I want to [Action] so that [Benefit/Value]".
+5. ACCEPTANCE CRITERIA: Define what makes each feature 'complete' for the MVP stage.
+6. NON-FUNCTIONAL REQUIREMENTS: Detail the performance (must load instantly), usability (mobile-first UI, accessible dark mode for low-vision users), and scalability constraints.
+7. OUT OF SCOPE FOR v1.0: Explicitly state what is NOT being built right now (e.g., real-time video streaming, payment gateways) to keep the MVP focused.
+
+Ensure the tone is authoritative, structured, and ready to be presented to high-level government education officials and startup incubators.
